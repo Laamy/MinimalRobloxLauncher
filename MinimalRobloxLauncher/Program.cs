@@ -2,6 +2,8 @@
 using System.Diagnostics;
 using System.IO;
 using System.Security.Principal;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Web;
 using System.Windows.Forms;
 
@@ -19,6 +21,7 @@ namespace MinimalRobloxLauncher
             key.Close();
         }
 
+        [STAThread]
         static void Main(string[] args)
         {
             if (args.Length == 0 && new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator))
@@ -28,6 +31,8 @@ namespace MinimalRobloxLauncher
             }
             else
             {
+                Task.Run(() => Application.Run(new LauncherWindow()));
+
                 var la = Launcher.ParseArgs(args[0]);
 
                 // https://clientsettingscdn.roblox.com/v2/client-version/WindowsPlayer
@@ -39,7 +44,7 @@ namespace MinimalRobloxLauncher
                     $"-j {HttpUtility.UrlDecode(la.PlaceLauncherUrl)} -b {la.BrowserTrackerID} --launchtime={la.LaunchTime} " +
                     $"--rloc {la.RobloxLocale} --gloc {la.GameLocale}");
 
-                Console.ReadLine();
+                Thread.Sleep(-1);
             }
         }
     }
